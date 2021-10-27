@@ -161,6 +161,14 @@ impl Tcp {
                     .handler("trace_tcp_drop")
                     .function("tcp_drop")
                     .attach(&mut bpf)?;
+                bcc::Kprobe::new()
+                    .handler("trace_tcp_syn_backlog")
+                    .function("tcp_v4_syn_recv_sock")
+                    .attach(&mut bpf)?;
+                bcc::Kprobe::new()
+                    .handler("trace_tcp_syn_backlog")
+                    .function("tcp_v6_syn_recv_sock")
+                    .attach(&mut bpf)?;
 
                 // probes at returns
                 bcc::Kretprobe::new()

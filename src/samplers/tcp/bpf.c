@@ -27,6 +27,7 @@ BPF_HASH(sock_stats_map, struct sock *, struct sock_stats_t);
 BPF_HISTOGRAM(connlat, int, 461);
 BPF_HISTOGRAM(srtt, int, 461);
 BPF_HISTOGRAM(jitter, int, 461);
+BPF_HISTOGRAM(syn_backlog, int, 461);
 
 // counters
 BPF_ARRAY(conn_accepted, u64, 1);
@@ -278,5 +279,15 @@ int trace_tcp_drop(struct pt_regs *ctx, struct sock *sk, struct sk_buff *skb)
         return 0;
     int loc = 0;
     add_value(drop.lookup(&loc), 1);
+    
+    return 0;
+}
+
+int trace_tcp_syn_backlog(struct pt_regs *ctx, struct sock *sk)
+{
+    if (!sk)
+        return 0;
+    
+    syn_backlog.increment(value_to_index2(sk->sk_ack_backlog));
     return 0;
 }

@@ -81,6 +81,8 @@ pub enum TcpStatistic {
     ConnectionInitiated,
     #[strum(serialize = "tcp/drop")]
     Drop,
+    #[strum(serialize = "tcp/syn_backlog")]
+    SynBacklog,
 }
 
 impl TcpStatistic {
@@ -120,6 +122,7 @@ impl TcpStatistic {
             Self::ConnectionAccepted => Some("conn_accepted"),
             Self::ConnectionInitiated => Some("conn_initiated"),
             Self::Drop => Some("drop"),
+            Self::SynBacklog => Some("syn_backlog"),
             _ => None,
         }
     }
@@ -132,7 +135,7 @@ impl Statistic<AtomicU64, AtomicU32> for TcpStatistic {
 
     fn source(&self) -> Source {
         match self.bpf_table() {
-            Some("connlat") | Some("srtt") | Some("jitter") => Source::Distribution,
+            Some("connlat") | Some("srtt") | Some("jitter") | Some("syn_backlog") => Source::Distribution,
             _ => Source::Counter,
         }
     }

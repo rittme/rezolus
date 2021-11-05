@@ -33,6 +33,7 @@ BPF_HISTOGRAM(syn_backlog, int, 461);
 BPF_ARRAY(conn_accepted, u64, 1);
 BPF_ARRAY(conn_initiated, u64, 1);
 BPF_ARRAY(drop, u64, 1);
+BPF_ARRAY(syn_max_backlog, u64, 1);
 
 // store a pointer by the pid
 static void store_ptr(u64 pid, u64 ptr)
@@ -283,11 +284,21 @@ int trace_tcp_drop(struct pt_regs *ctx, struct sock *sk, struct sk_buff *skb)
     return 0;
 }
 
-int trace_tcp_syn_backlog(struct pt_regs *ctx, struct sock *sk)
+int trace_tcp_syn_backlog(struct pt_regs *ctx)
 {
+    // tcp_v4_syn_recv_sock and tcp_v6_syn_recv_sock receive the socket as first parameter, 
+    // so we can get it through PT_REGS_PARM1
+    struct sock *sk = (struct sock *)PT_REGS_PARM1(ctx);
     if (!sk)
         return 0;
     
+    // Increment the histogram for syn_backlog size
     syn_backlog.increment(value_to_index2(sk->sk_ack_backlog));
+
+    // Track the max size of the syn_backlog
+    u64 max = (u64)sk->sk_max_ack_backlog;
+    int loc = 0;
+    syn_max_backlog.update(&loc, &max);
+    
     return 0;
 }

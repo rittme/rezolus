@@ -498,7 +498,8 @@ This sampler provides telemetry about TCP traffic and connections.
 * `tcp/connection/accepted` - number of connections accepted passively
 * `tcp/connection/initiated` - number of connections initiated actively
 * `tcp/drop` - number of packets dropped in the kernel TCP stack
-* `tcp/syn_backlog` - size of the TCP SYN backlog
+* `tcp/syn_backlog` - the size of the TCP SYN backlog
+* `tcp/syn_max_backlog` - the max size of the TCP SYN backlog
 
 ## UDP
 

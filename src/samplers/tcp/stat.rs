@@ -83,6 +83,8 @@ pub enum TcpStatistic {
     Drop,
     #[strum(serialize = "tcp/syn_backlog")]
     SynBacklog,
+    #[strum(serialize = "tcp/syn_max_backlog")]
+    SynMaxBacklog,
 }
 
 impl TcpStatistic {
@@ -123,6 +125,7 @@ impl TcpStatistic {
             Self::ConnectionInitiated => Some("conn_initiated"),
             Self::Drop => Some("drop"),
             Self::SynBacklog => Some("syn_backlog"),
+            Self::SynMaxBacklog => Some("syn_max_backlog"),
             _ => None,
         }
     }

@@ -502,6 +502,7 @@ This sampler provides telemetry about TCP traffic and connections.
 * `tcp/transmit/retransmit_timeout` - number of retransmit timeouts
 * `tcp/receive/duplicate` - number of duplicate TCP segments received.
 * `tcp/receive/out_of_order` - number of out of order TCP segments received.
+* `tcp/syn_backlog` - the usage percentage of the SYN backlog (represented over 10000 for two decimal placse precision)
 
 ## UDP
 

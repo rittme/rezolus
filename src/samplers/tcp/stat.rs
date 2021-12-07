@@ -88,6 +88,8 @@ pub enum TcpStatistic {
     Duplicate,
     #[strum(serialize = "tcp/receive/out_of_order")]
     OutOfOrder,
+    #[strum(serialize = "tcp/syn_backlog")]
+    SynBacklog,
 }
 
 impl TcpStatistic {
@@ -131,6 +133,7 @@ impl TcpStatistic {
             Self::RetransmitTimeout => Some("rto"),
             Self::Duplicate => Some("duplicate"),
             Self::OutOfOrder => Some("ooo"),
+            Self::SynBacklog => Some("syn_backlog"),
             _ => None,
         }
     }
@@ -242,6 +245,22 @@ impl TcpStatistic {
             binary_path: None,
             sub_system: None,
         };
+        let tcp_syn_recv_v4_probe = Probe {
+            name: "tcp_v4_syn_recv_sock".to_string(),
+            handler: "trace_tcp_syn_backlog".to_string(),
+            probe_type: ProbeType::Kernel,
+            probe_location: ProbeLocation::Entry,
+            binary_path: None,
+            sub_system: None,
+        };
+        let tcp_syn_recv_v6_probe = Probe {
+            name: "tcp_v6_syn_recv_sock".to_string(),
+            handler: "trace_tcp_syn_backlog".to_string(),
+            probe_type: ProbeType::Kernel,
+            probe_location: ProbeLocation::Entry,
+            binary_path: None,
+            sub_system: None,
+        };
 
         // specify what probes are required for each telemetry.
         match self {
@@ -265,6 +284,7 @@ impl TcpStatistic {
             Self::RetransmitTimeout => vec![tcp_rto_probe],
             Self::Duplicate => vec![tcp_validate_incoming_probe],
             Self::OutOfOrder => vec![tcp_validate_incoming_probe],
+            Self::SynBacklog => vec![tcp_syn_recv_v4_probe, tcp_syn_recv_v6_probe],
             _ => Vec::new(),
         }
     }

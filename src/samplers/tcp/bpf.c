@@ -28,6 +28,7 @@ BPF_HASH(sock_stats_map, struct sock *, struct sock_stats_t);
 BPF_HISTOGRAM(connlat, int, 461);
 BPF_HISTOGRAM(srtt, int, 461);
 BPF_HISTOGRAM(jitter, int, 461);
+BPF_HISTOGRAM(syn_backlog, int, 10000);
 
 // counters
 BPF_ARRAY(conn_accepted, u64, 1);
@@ -296,5 +297,17 @@ int trace_validate_incoming(struct pt_regs *ctx, struct sock *sk, struct sk_buff
         int loc = 0;
         add_value(ooo.lookup(&loc), 1);    
     }
+    return 0;
+}
+
+int trace_tcp_syn_backlog(struct pt_regs *ctx, const struct sock *sk)
+{
+    if (!sk)
+        return 0;
+
+    // Track the usage percentage of the SYN backlog
+    // Use 10000 to store two decimal places
+    u64 usage_percentage = ((u64)sk->sk_ack_backlog * 10000) / (u64)sk->sk_max_ack_backlog;
+    syn_backlog.increment(usage_percentage);    
     return 0;
 }
